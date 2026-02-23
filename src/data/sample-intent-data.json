@@ -1,0 +1,22 @@
+{
+  "samples": [
+    { "text": "I want my money back. Please process a refund.", "label": "refund" },
+    { "text": "The app crashes when I tap the submit button.", "label": "bug_report" },
+    { "text": "It would be great if you added dark mode.", "label": "feature_request" },
+    { "text": "Hello! How are you doing today?", "label": "greeting" },
+    { "text": "Thanks for your help. Have a great day!", "label": "farewell" },
+    { "text": "What are your business hours?", "label": "general_inquiry" },
+    { "text": "I've been waiting for days. This is unacceptable.", "label": "complaint" },
+    { "text": "Can I get a refund for my last purchase?", "label": "refund" },
+    { "text": "Error 500 when loading the dashboard.", "label": "bug_report" },
+    { "text": "Please add export to PDF feature.", "label": "feature_request" },
+    { "text": "Hi there!", "label": "greeting" },
+    { "text": "Goodbye!", "label": "farewell" },
+    { "text": "Where can I find the documentation?", "label": "general_inquiry" },
+    { "text": "The service is terrible. I want to speak to a manager.", "label": "complaint" },
+    { "text": "Return and refund policy please.", "label": "refund" },
+    { "text": "Login fails on Safari browser.", "label": "bug_report" },
+    { "text": "It would help if we had bulk upload.", "label": "feature_request" },
+    { "text": "How do I reset my password?", "label": "general_inquiry" }
+  ]
+}

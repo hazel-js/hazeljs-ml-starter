@@ -1,0 +1,24 @@
+{
+  "samples": [
+    { "text": "This product is amazing! I love it so much.", "label": "positive" },
+    { "text": "Terrible experience, would never buy again.", "label": "negative" },
+    { "text": "It's okay, nothing special.", "label": "neutral" },
+    { "text": "Best purchase I've ever made. Highly recommend!", "label": "positive" },
+    { "text": "Waste of money. Completely disappointed.", "label": "negative" },
+    { "text": "The item arrived on time. Standard quality.", "label": "neutral" },
+    { "text": "Excellent quality and fast shipping!", "label": "positive" },
+    { "text": "Horrible product, broke after one day.", "label": "negative" },
+    { "text": "Good value for the price. Would consider again.", "label": "positive" },
+    { "text": "Not what I expected. Poor customer service.", "label": "negative" },
+    { "text": "It works as described. No complaints.", "label": "neutral" },
+    { "text": "Absolutely wonderful! Exceeded all expectations.", "label": "positive" },
+    { "text": "Very disappointed with this purchase.", "label": "negative" },
+    { "text": "Decent product. Does the job.", "label": "neutral" },
+    { "text": "Love it! Perfect for my needs.", "label": "positive" },
+    { "text": "Useless. Don't bother buying.", "label": "negative" },
+    { "text": "Average product. Gets the job done.", "label": "neutral" },
+    { "text": "Fantastic! Better than I hoped for.", "label": "positive" },
+    { "text": "Awful quality. Returning immediately.", "label": "negative" },
+    { "text": "It's fine. Nothing to write home about.", "label": "neutral" }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "samples": [
+    { "text": "Win a free iPhone now! Click here to claim your prize.", "label": "spam" },
+    { "text": "Meeting tomorrow at 10am. Please confirm attendance.", "label": "ham" },
+    { "text": "Congratulations! You've won $1,000,000. Send your bank details.", "label": "spam" },
+    { "text": "Thanks for the invoice. I'll process the payment today.", "label": "ham" },
+    { "text": "URGENT: Act now! Limited time offer. Call 555-1234.", "label": "spam" },
+    { "text": "Can we schedule a call to discuss the project?", "label": "ham" },
+    { "text": "Free money! No strings attached. Just click here.", "label": "spam" },
+    { "text": "Please find attached the quarterly report.", "label": "ham" },
+    { "text": "You've been selected for our exclusive lottery. Reply to win.", "label": "spam" },
+    { "text": "Hi team, reminder about the deadline on Friday.", "label": "ham" },
+    { "text": "Lose weight fast! Guaranteed results. Buy now.", "label": "spam" },
+    { "text": "The bug fix has been deployed to staging.", "label": "ham" },
+    { "text": "Make money from home. Work 2 hours, earn $5000.", "label": "spam" },
+    { "text": "Could you please review my pull request?", "label": "ham" },
+    { "text": "Nigeria prince needs your help. Transfer funds today.", "label": "spam" },
+    { "text": "Thanks for your email. I'll get back to you soon.", "label": "ham" }
+  ]
+}
