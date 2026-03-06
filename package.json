@@ -9,15 +9,16 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "train:sample": "ts-node src/scripts/train-with-sample-data.ts",
     "train:embedding": "ts-node src/scripts/train-embedding-model.ts",
+    "evaluate:sample": "ts-node src/scripts/evaluate-with-sample-data.ts",
+    "example:decorators": "ts-node src/examples/decorator-example.ts",
     "test": "jest --coverage",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
-    "@hazeljs/core": "0.2.0-beta.38",
-    "@hazeljs/ml": "0.2.0-beta.38",
-    "@huggingface/transformers": "^3.0.0",
-    "reflect-metadata": "^0.2.2"
+    "@hazeljs/core": "0.2.0-beta.71",
+    "@hazeljs/ml": "0.2.0-beta.71",
+    "@huggingface/transformers": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.50",

@@ -7,7 +7,7 @@
  * Downloads the all-MiniLM-L6-v2 model on first run (~90MB), then
  * embeds samples and computes centroids for centroid-based classification.
  */
-import 'reflect-metadata';
+
 import { Container } from '@hazeljs/core';
 import { TrainerService, ModelRegistry, PipelineService } from '@hazeljs/ml';
 import { EmbeddingSentimentClassifier } from '../models';

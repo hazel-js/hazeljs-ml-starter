@@ -9,7 +9,7 @@
  * Run: npm run dev
  * API: http://localhost:3000
  */
-import 'reflect-metadata';
+
 import { HazelApp } from '@hazeljs/core';
 import { AppModule } from './app.module';
 import logger from '@hazeljs/core';
@@ -28,11 +28,12 @@ async function bootstrap(): Promise<void> {
   logger.info('');
   logger.info('API Endpoints:');
   logger.info('  POST /ml/predict       - Single sentiment prediction');
-  logger.info('  POST /ml/predict/batch - Batch prediction');
+  logger.info('  POST /ml/predict/batch - Batch prediction (results in input order)');
   logger.info('  POST /ml/train         - Train model with labeled samples');
+  logger.info('  POST /ml/evaluate      - Evaluate model on test data');
   logger.info('  GET  /ml/metrics       - Model metrics');
   logger.info('  GET  /ml/models        - List registered models');
-  logger.info('  GET  /health            - Health check');
+  logger.info('  GET  /health           - Health check');
   logger.info('');
 }
 

@@ -32,6 +32,26 @@ npm run dev
 
 The API runs at **http://localhost:3000**.
 
+## ML Decorators
+
+This starter uses the three **@hazeljs/ml** decorators so the registry and services can discover models without manual wiring.
+
+| Decorator | Where | Purpose |
+|-----------|--------|---------|
+| **`@Model`** | Class | Registers the model with `name`, `version`, `framework`. Required so `TrainerService` and `PredictorService` can find it. |
+| **`@Train`** | One method | Marks the method that trains the model. `TrainerService.train(modelName, data)` calls it. Options: `pipeline`, `batchSize`, `epochs`. |
+| **`@Predict`** | One method | Marks the method that runs inference. `PredictorService.predict(modelName, input)` calls it. Options: `batch`, `endpoint`. |
+
+**Rules:** One `@Model` per class; exactly one `@Train()` and one `@Predict()` method per model. Use `@Injectable()` from `@hazeljs/core` so the app can create the model.
+
+**In this repo:** See `src/models/sentiment.model.ts`, `src/models/spam.classifier.ts`, and `src/models/intent.classifier.ts` for full examples. Run the minimal decorator example:
+
+```bash
+npm run example:decorators
+```
+
+See [Decorator example](#decorator-example) below for a minimal code walkthrough.
+
 ## Models
 
 | Model | Use Case | Labels |
@@ -82,10 +102,28 @@ curl -X POST http://localhost:3000/ml/predict \
 
 ### Batch Prediction
 
+Results are returned in the same order as inputs.
+
 ```bash
 curl -X POST http://localhost:3000/ml/predict/batch \
   -H "Content-Type: application/json" \
   -d '{"texts": ["Great product!", "Terrible experience."], "model": "sentiment-classifier"}'
+```
+
+### Evaluate Model
+
+Run evaluation on test data to compute accuracy, F1, precision, and recall:
+
+```bash
+curl -X POST http://localhost:3000/ml/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "sentiment-classifier",
+    "testData": [
+      {"text": "Love it!", "label": "positive"},
+      {"text": "Terrible.", "label": "negative"}
+    ]
+  }'
 ```
 
 ### Train Model
@@ -151,13 +189,16 @@ hazeljs-ml-starter/
 │   │   └── ml.controller.ts    # REST API
 │   ├── ml/
 │   │   └── ml.bootstrap.ts     # Training pipeline setup
+│   ├── examples/
+│   │   └── decorator-example.ts # Minimal @Model / @Train / @Predict (npm run example:decorators)
 │   ├── data/
 │   │   ├── sample-training-data.json  # Sentiment samples
 │   │   ├── sample-spam-data.json       # Spam/ham samples
 │   │   └── sample-intent-data.json     # Intent samples
 │   └── scripts/
-│       ├── train-with-sample-data.ts   # CLI training (bag-of-words sentiment)
-│       └── train-embedding-model.ts    # CLI training (embedding sentiment)
+│       ├── train-with-sample-data.ts   # CLI training (inline pipeline)
+│       ├── train-embedding-model.ts    # CLI training (embedding sentiment)
+│       └── evaluate-with-sample-data.ts # CLI evaluation (MetricsService.evaluate)
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -165,29 +206,43 @@ hazeljs-ml-starter/
 
 ## Model Implementation
 
-The `SentimentClassifier` uses `@hazeljs/ml` decorators:
+Every model in this starter follows the same pattern. Example from **SentimentClassifier** (`src/models/sentiment.model.ts`):
 
 ```typescript
 @Model({
   name: 'sentiment-classifier',
   version: '1.0.0',
   framework: 'custom',
+  description: 'Text sentiment classification (positive/negative/neutral)',
+  tags: ['nlp', 'sentiment', 'production'],
 })
 @Injectable()
 export class SentimentClassifier {
-  @Train({ pipeline: 'sentiment-preprocessing', epochs: 1 })
+  @Train({ pipeline: 'sentiment-preprocessing', epochs: 1, batchSize: 32 })
   async train(data: SentimentTrainingData): Promise<TrainingResult> {
     // Build word frequency maps from labeled samples
     // ...
   }
 
-  @Predict({ batch: true })
+  @Predict({ batch: true, endpoint: '/predict' })
   async predict(input: unknown): Promise<SentimentPrediction> {
     // Score text against learned vocabularies
     // ...
   }
 }
 ```
+
+**SpamClassifier** and **IntentClassifier** use the same three decorators with different `name`, `pipeline`, and logic; see `src/models/spam.classifier.ts` and `src/models/intent.classifier.ts`.
+
+## Decorator example
+
+A minimal runnable example that uses only the decorators and the registry (no HTTP server) lives in `src/examples/decorator-example.ts`. Run it with:
+
+```bash
+npm run example:decorators
+```
+
+It defines a small classifier with `@Model`, `@Train`, and `@Predict`, registers it with `registerMLModel`, then calls `TrainerService.train()` and `PredictorService.predict()`. Use it as a template for adding a new model to this app.
 
 ## Training Pipeline
 
@@ -198,19 +253,22 @@ The `PipelineService` registers preprocessing steps used before training:
 
 Register pipelines in `ml.bootstrap.ts`; they run automatically when `TrainerService.train()` is invoked.
 
-## Programmatic Training
+## Programmatic Training & Evaluation
 
-Train without the HTTP API:
+Train and evaluate without the HTTP API:
 
 ```bash
-# Bag-of-words sentiment model
+# Bag-of-words sentiment (uses inline PipelineService.run(data, steps))
 npm run train:sample
 
 # Embedding-based sentiment (downloads all-MiniLM-L6-v2 ~90MB on first run)
 npm run train:embedding
+
+# Evaluate sentiment model on sample data (MetricsService.evaluate())
+npm run evaluate:sample
 ```
 
-These load `src/data/sample-training-data.json` and train the respective model. Useful for:
+These load `src/data/sample-training-data.json`. Useful for:
 
 - Initial model setup
 - CI/CD training jobs
@@ -222,7 +280,7 @@ These load `src/data/sample-training-data.json` and train the respective model. 
 
 2. **Model Persistence** – Save/load trained weights to disk (e.g. `models/` directory) in `train()` and on model construction.
 
-3. **MetricsService** – Call `metricsService.recordEvaluation()` after training/validation to support A/B tests and monitoring.
+3. **MetricsService** – Use `metricsService.evaluate(modelName, testData)` to compute accuracy, F1, precision, recall on test data. Results are auto-recorded for A/B tests and monitoring.
 
 4. **PipelineService** – Add richer ETL (tokenization, feature extraction) or integrate with `@hazeljs/data`.
 

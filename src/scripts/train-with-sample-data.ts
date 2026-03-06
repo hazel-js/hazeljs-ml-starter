@@ -5,11 +5,13 @@
  * Usage: npm run train:sample
  *
  * This script demonstrates programmatic training outside the HTTP API.
+ * Uses PipelineService.run(data, steps) for inline preprocessing (no registration).
  * Useful for batch jobs, CI/CD pipelines, or initial model setup.
  */
-import 'reflect-metadata';
+
 import { Container } from '@hazeljs/core';
-import { TrainerService, ModelRegistry } from '@hazeljs/ml';
+import { TrainerService, ModelRegistry, PipelineService } from '@hazeljs/ml';
+import type { PipelineStep } from '@hazeljs/ml';
 import { SentimentClassifier } from '../models';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -20,6 +22,9 @@ async function main(): Promise<void> {
   // Register services and model
   const registry = new ModelRegistry();
   container.register(ModelRegistry, registry);
+
+  const pipelineService = new PipelineService();
+  container.register(PipelineService, pipelineService);
 
   const trainer = new TrainerService(registry);
   container.register(TrainerService, trainer);
@@ -46,14 +51,43 @@ async function main(): Promise<void> {
   }
 
   const raw = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
-  const trainingData = { samples: raw.samples ?? [] };
+  const rawData = { samples: raw.samples ?? [] };
 
-  if (trainingData.samples.length === 0) {
+  if (rawData.samples.length === 0) {
     console.error('No samples in training data');
     process.exit(1);
   }
 
-  console.log(`Training with ${trainingData.samples.length} samples...`);
+  // Inline pipeline steps (no registration required)
+  const steps: PipelineStep[] = [
+    {
+      name: 'normalize',
+      transform: (data: unknown) => {
+        const d = data as { samples?: Array<{ text?: string; label?: string }> };
+        if (!d?.samples) return d;
+        const normalized = d.samples.map((s) => ({
+          text: (s.text ?? '').toString().trim().toLowerCase(),
+          label: (s.label ?? 'neutral').toLowerCase(),
+        }));
+        return { ...d, samples: normalized };
+      },
+    },
+    {
+      name: 'filter-invalid',
+      transform: (data: unknown) => {
+        const d = data as { samples?: Array<{ text: string; label: string }> };
+        if (!d?.samples) return d;
+        const validLabels = ['positive', 'negative', 'neutral'];
+        const filtered = d.samples.filter(
+          (s) => s.text?.length > 0 && validLabels.includes(s.label)
+        );
+        return { ...d, samples: filtered };
+      },
+    },
+  ];
+
+  const trainingData = (await pipelineService.run(rawData, steps)) as { samples: Array<{ text: string; label: string }> };
+  console.log(`Training with ${trainingData.samples.length} samples (preprocessed via inline pipeline)...`);
 
   const result = await trainer.train('sentiment-classifier', trainingData);
 
